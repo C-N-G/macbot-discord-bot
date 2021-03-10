@@ -1,0 +1,6 @@
+node_modules
+*.bat*
+config.json
+nw_servers.txt
+data/steamprofiles.json
+data/music_cache
