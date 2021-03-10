@@ -1,0 +1,26 @@
+{
+  "name": "macbot",
+  "version": "1.0.0",
+  "description": "multi purpose discord bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "cormac gudge",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/opus": "^0.2.1",
+    "canvas": "^2.7.0",
+    "cheerio": "^1.0.0-rc.5",
+    "discord.js": "^12.5.1",
+    "eslint": "^7.21.0",
+    "ffmpeg-static": "^4.2.7",
+    "fuse.js": "^6.4.6",
+    "googleapis": "^49.0.0",
+    "got": "^11.8.2",
+    "moment-timezone": "^0.5.33",
+    "prism-media": "^1.2.7",
+    "yt-search": "^2.7.3",
+    "ytdl-core": "^3.4.2"
+  }
+}
