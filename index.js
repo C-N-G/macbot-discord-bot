@@ -17,7 +17,7 @@ client.servers = new Discord.Collection(); // for music bot functions
 
 client.chessGames = new Discord.Collection(); // for chess matches
 
-
+client.people = new Discord.Collection(); // for individual user interactions
 
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
