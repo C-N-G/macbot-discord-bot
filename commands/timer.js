@@ -122,8 +122,9 @@ module.exports = {
     }
 
     let length = format_length(args);
+    console.log(length);
 
-    if (length > 43200000) {
+    if (length > 43200) {
       return message.channel.send('The maximum length of timers is 12 hours. Please choose a shorter length');
     } else if (length == 0) {
       return message.channel.send('You did not provide enough time to make a timer');
