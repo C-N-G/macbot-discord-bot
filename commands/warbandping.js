@@ -195,7 +195,8 @@ module.exports = {
     }
 
     if (args[0] === 'gf') {
-      args[0] = '193.70.7.93:7400';
+      // args[0] = '193.70.7.93:7400'; # old ip - server host burnt down in a fire
+      args[0] = '145.239.205.24:7247';
     } else if (args[0] === 'tp') {
       args[0] = '78.46.45.166:4153';
     }
