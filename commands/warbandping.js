@@ -92,7 +92,6 @@ module.exports = {
           break;
         }
       }
-      console.log(data);
       let server = {};
       server.address = addr;
       try {
