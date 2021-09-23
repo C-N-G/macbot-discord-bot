@@ -1,4 +1,18 @@
 module.exports = {
+
+  get_time_from_text(input) {
+    // hh:mm:ss
+    let regex = /(\d{1,2}:\d{1,2}:\d{1,2})|(\d{1,2}:\d{1,2})|(\d{1,2})/g;
+    const arr_matches = [...input.matchAll(regex)];
+    if (!regex.test(input) || input.length > 8 || arr_matches.length > 1) return false;
+    let times = input.split(':');
+    let seconds = 0;
+    if (times.length === 3) seconds += (parseInt(times[0]) * 60 * 60);
+    if (times.length === 2) seconds += (parseInt(times[times.length - 2]) * 60);
+    seconds += (parseInt(times[times.length - 1]));
+    return seconds;
+  },
+
   convert_time (seconds) {
     if (seconds < 60) {
       return `${Math.floor(seconds)}`;
@@ -37,20 +51,20 @@ module.exports = {
     return `${hours} hours ${minutes} minutes ${returnSeconds} seconds`;
   },
 
-  check_bot_location (message, location) {
+  check_bot_location (interaction, location) {
     if (location === 'same-voice') {
-      const voiceChannel = message.member.voice.channel;
-      if (!message.guild.voice) {
+      const voiceChannel = interaction.member.voice.channelId;
+      if (!interaction.guild.me.voice.channelId) {
         return false;
       }
-      const botVoiceChannel = message.guild.voice.channel;
+      const botVoiceChannel = interaction.guild.me.voice.channelId;
       if (!voiceChannel || voiceChannel !== botVoiceChannel) {
         return false;
       } else {
         return true;
       }
     } else if (location === 'in-voice') {
-      if (!message.guild.voice) {
+      if (!interaction.guild.me.voice.channelId) {
         return false;
       } else {
         return true;

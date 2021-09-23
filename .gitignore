@@ -4,3 +4,4 @@ config.json
 nw_servers.txt
 data/steamprofiles.json
 data/music_cache
+deploy-commands.js
