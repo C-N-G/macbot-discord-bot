@@ -5,3 +5,4 @@ nw_servers.txt
 data/steamprofiles.json
 data/music_cache
 deploy-commands.js
+deploy-commands-globally.js

@@ -14,7 +14,6 @@ const util = require('./util.js');
 const fs = require('fs');
 const prism = require('prism-media');
 const { MessageEmbed } = require('discord.js');
-const { setTimeout } = require('timers/promises');
 
 module.exports = {
   async play(interaction, seekTime) {
@@ -250,7 +249,7 @@ module.exports = {
     if (server.nowPlayingMessage && server.nowPlayingMessage.deletable) await server.nowPlayingMessage.delete();
     clearInterval(server.seekCache);
     server.queue = [];
-    server.playing.stop();
+    if (server.playing) await server.playing.stop();
     server.playing = '';
     server.seekTime = '';
     server.nowPlayingMessage = '';
@@ -295,6 +294,7 @@ module.exports = {
     if (server.playing == '') {
       let connection = getVoiceConnection(interaction.guild.id);
       connection.destroy();
+      console.log('disconnect accomplished');
     }
   }
 
