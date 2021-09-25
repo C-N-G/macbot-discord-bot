@@ -68,6 +68,20 @@ module.exports = {
   
       });
 
+      player.on(AudioPlayerStatus.Paused, () => {
+        if (server.aloneInChannel) {
+          const embed = new MessageEmbed()
+            .setColor('AQUA')
+            .setDescription(`Audio source paused due to empty voice channel`);
+          interaction.channel.send({ embeds: [embed] });
+        }
+        this.start_disconnect_interval(interaction, 10);
+      });
+
+      player.on(AudioPlayerStatus.Playing, () => {
+        this.remove_disconnect_interval(interaction);
+      });
+
     } else {
       player = server.playing;
     }
@@ -129,6 +143,7 @@ module.exports = {
       this.play(interaction);
     } else if (server.playing) {
       this.clear_server(interaction);
+      this.start_disconnect_timer(interaction, 30);
     }
 
   },
@@ -220,10 +235,10 @@ module.exports = {
   },
 
   get_server(interaction) {
-    const client = interaction.client;
-    const thisServer = interaction.guildId;
+    const client = interaction.guild.client;
+    const thisServer = interaction.guild.id;
     if (!client.servers.has(thisServer)) client.servers.set(thisServer, {id: thisServer});
-    const server = client.servers.get(interaction.guildId);
+    const server = client.servers.get(interaction.guild.id);
     return server;
   },
 
@@ -253,7 +268,6 @@ module.exports = {
     server.playing = '';
     server.seekTime = '';
     server.nowPlayingMessage = '';
-    this.start_disconnect_timer(interaction);
   },
 
   async search_youtube(search) {
@@ -275,27 +289,45 @@ module.exports = {
 
   },
 
-  start_disconnect_timer(interaction) {
+  start_disconnect_timer(interaction, minutes) {
     const server = this.get_server(interaction);
-    const msTimeToDisconnect = 30*60*1000;
-    server.timer = setTimeout(() => {
-      this.disconnect_timer(interaction);
+    const msTimeToDisconnect = minutes*60*1000;
+    server.dcTimer = setTimeout(() => {
+      this.disconnect_bot(interaction);
     }, msTimeToDisconnect);
   },
 
   remove_disconnect_timer(interaction) {
     const server = this.get_server(interaction);
-    if (!server.timer) return;
-    clearTimeout(server.timer);
+    if (!server.dcTimer) return;
+    clearTimeout(server.dcTimer);
   },
 
-  disconnect_timer(interaction) {
+  start_disconnect_interval(interaction, minutes) {
     const server = this.get_server(interaction);
-    if (server.playing == '') {
-      let connection = getVoiceConnection(interaction.guild.id);
-      connection.destroy();
-      console.log('disconnect accomplished');
-    }
+    const msTimeToDisconnect = minutes*60*1000;
+    server.dcInterval = setInterval(() => {
+      if (!server.aloneInChannel) return;
+      this.disconnect_bot(interaction);
+      const embed = new MessageEmbed()
+        .setColor('AQUA')
+        .setDescription(`I have left the voice channel due to loneliness.`);
+      interaction.channel.send({ embeds: [embed] });
+    }, msTimeToDisconnect);
+  },
+
+  remove_disconnect_interval(interaction) {
+    const server = this.get_server(interaction);
+    if (!server.dcInterval) return;
+    clearInterval(server.dcInterval);
+  },
+
+  disconnect_bot(interaction) {
+    const server = this.get_server(interaction);
+    if (server.dcInterval) this.remove_disconnect_interval(interaction);
+    if (server.dcTimer) this.remove_disconnect_timer(interaction);
+    let connection = getVoiceConnection(interaction.guild.id);
+    connection.destroy();
   }
 
 };

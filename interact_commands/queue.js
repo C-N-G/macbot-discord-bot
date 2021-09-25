@@ -27,9 +27,10 @@ module.exports = {
     let msg = queue.map((ele, index) => `${index+1}: **[${util.convert_time(ele.timeLength)}]** [${ele.title}](${ele.link}) - <@${ele.userId}>`);
     msg[0] = `1: **[${currentTime}/${util.convert_time(queue[0].timeLength)}]** [${queue[0].title}](${queue[0].link}) - <@${queue[0].userId}>`;
     msg = msg.join('\n');
+    const title = server.playing.state.status ==='paused' ? 'Queue is Paused' : 'Queue is playing';
     const embed = new MessageEmbed()
       .setColor('AQUA')
-      .setTitle('Queue')
+      .setTitle(title)
       .setDescription(msg);
     await interaction.reply({ embeds: [embed]});
 	}

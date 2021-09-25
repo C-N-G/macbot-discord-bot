@@ -1,6 +1,7 @@
 const mediaPlayer = require('../util/mediaPlayer.js');
 const { check_bot_location } = require('../util/util.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -28,7 +29,10 @@ module.exports = {
     const size = server.queue.length;
     server.queue = [];
     mediaPlayer.play_next_item(interaction);
-    await interaction.reply(`Emptied ${size} item(s) from the queue.`);
+    const embed = new MessageEmbed()
+      .setColor('AQUA')
+      .setDescription(`Emptied ${size} item(s) from the queue.`);
+    await interaction.reply({ embeds: [embed] });
 
 	}
 };

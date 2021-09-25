@@ -10,8 +10,9 @@ module.exports = {
       return await interaction.reply(`Only <@150362891541938177> can use this command`);
     }
 
-    process.exit();
     await interaction.reply(':thumbsup:');
+
+    process.exit();
 
 	}
 };
