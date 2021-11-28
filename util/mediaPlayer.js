@@ -39,6 +39,8 @@ module.exports = {
       player.on(AudioPlayerStatus.Idle, () => {
   
         server.seekTime = '';
+
+        if (server.looping) return this.play(interaction);
   
         if (server.playing_cached) {
           
@@ -46,13 +48,13 @@ module.exports = {
 
           let IdToRemove = audio.id;
 
-          setTimeout(() => {
+          setTimeout(() => { //give a grace period for ffmpeg to close
             fs.unlink(`./data/music_cache/${interaction.guild.id}_${IdToRemove}.webm`, (err) => {
               if (err) console.log(err);
             });
           }, 5*1000);
 
-        } else if (audio.cached) {
+        } else if (audio.cached) { //otherwise remove immediately
 
           fs.unlink(`./data/music_cache/${interaction.guild.id}_${audio.id}.webm`, (err) => {
             if (err) console.log(err);
@@ -60,11 +62,7 @@ module.exports = {
 
         }
 
-        if (server.looping) {
-          this.play(interaction);
-        } else {
-          this.play_next_item(interaction);
-        }
+        this.play_next_item(interaction);
   
       });
 
