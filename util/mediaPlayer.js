@@ -41,26 +41,6 @@ module.exports = {
         server.seekTime = '';
 
         if (server.looping) return this.play(interaction);
-  
-        if (server.playing_cached) {
-          
-          server.ffmpeg.kill();
-
-          let IdToRemove = audio.id;
-
-          setTimeout(() => { //give a grace period for ffmpeg to close
-            fs.unlink(`./data/music_cache/${interaction.guild.id}_${IdToRemove}.webm`, (err) => {
-              if (err) console.log(err);
-            });
-          }, 5*1000);
-
-        } else if (audio.cached) { //otherwise remove immediately
-
-          fs.unlink(`./data/music_cache/${interaction.guild.id}_${audio.id}.webm`, (err) => {
-            if (err) console.log(err);
-          });
-
-        }
 
         this.play_next_item(interaction);
   
@@ -136,10 +116,11 @@ module.exports = {
 
     const server = this.get_server(interaction);
     const queue = server.queue;
-    if (queue.length > 1) {
+    if (queue.length > 1) {// if is 2 or more then play next item
+      this.clear_single_cache(interaction);
       queue.shift();
       this.play(interaction);
-    } else if (server.playing) {
+    } else if (server.playing) {// otherwise only 1 item in queue so commence shutdown
       this.clear_server(interaction);
       this.start_disconnect_timer(interaction, 30);
     }
@@ -252,11 +233,7 @@ module.exports = {
     }
 
     server.removeAllTimeout = setTimeout(() => {
-      server.queue.forEach(item => {
-        fs.unlink(`./data/music_cache/${interaction.guildId}_${item.id}.webm`, (err) => {
-          if (err) console.log(err);
-        });
-      });
+      this.clear_all_cache(interaction);
     }, 5*1000);
 
     if (server.nowPlayingMessage && server.nowPlayingMessage.deletable) await server.nowPlayingMessage.delete();
@@ -266,6 +243,45 @@ module.exports = {
     server.playing = '';
     server.seekTime = '';
     server.nowPlayingMessage = '';
+  },
+
+  clear_single_cache(interaction) {
+
+    const server = this.get_server(interaction);
+
+    let audio = server.queue[0];
+
+    if (server.playing_cached) {
+          
+      server.ffmpeg.kill();
+
+      setTimeout(() => { //give a grace period for ffmpeg to close
+        fs.unlink(`./data/music_cache/${interaction.guild.id}_${audio.id}.webm`, (err) => {
+          if (err) console.log(err);
+        });
+      }, 5*1000);
+
+    } else if (audio.cached) { //otherwise remove immediately
+
+      fs.unlink(`./data/music_cache/${interaction.guild.id}_${audio.id}.webm`, (err) => {
+        if (err) console.log(err);
+      });
+
+    }
+  },
+
+  clear_all_cache(interaction) {
+
+    let files = fs.readdirSync("./data/music_cache/");
+
+    files = files.filter(file => file.includes(interaction.guild.id));
+
+    files.forEach(file => {
+      fs.unlink(`./data/music_cache/${file}`, (err) => {
+        if (err) console.log(err);
+      });
+    });
+
   },
 
   async search_youtube(search) {
